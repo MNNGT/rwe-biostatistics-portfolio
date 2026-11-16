@@ -1,49 +1,48 @@
-# Demonstration Statistical Analysis Plan (SAP)
+# Plan d'analyse statistique (SAP) / Statistical Analysis Plan (SAP)
 
-**Title:** Synthetic observational oncology cohort – illustrative RWE statistical analyses  
-**Version:** 1.0 | 16 November 2026  
-**Status:** Educational demonstration, not an approved clinical-study SAP
+**Projet / Project:** Cohorte observationnelle oncologique entièrement synthétique / Fully synthetic observational oncology cohort  
+**Version:** 1.1 — 16 novembre / November 16, 2026  
+**Statut / Status:** Démonstration pédagogique, non validée pour une étude clinique / Educational demonstration; not an approved clinical-study SAP
 
-## 1. Objective and study design
+## 1. Objectifs et conception / Objectives and study design
 
-Demonstrate time-to-event analysis and repeated-outcome modelling within a synthetic, observational two-group cohort. The setting and every individual record are fictional. No confirmatory clinical hypothesis or causal inference is intended.
+**FR —** Illustrer les analyses de survie, les régressions multivariées et la modélisation de mesures répétées dans une cohorte fictive à deux groupes de traitement. Aucune hypothèse clinique confirmatoire ni estimation causale n'est prévue.  
+**EN —** Demonstrate survival analysis, multivariable regression and repeated-outcome modelling in a fictional two-group cohort. No confirmatory clinical hypothesis or causal inference is intended.
 
-## 2. Analysis populations and data sources
+## 2. Populations d'analyse / Analysis populations
 
-- **Time-to-event population:** All 900 simulated participants with a valid follow-up time, event indicator and baseline covariates.
-- **12-month logistic-analysis population:** Participants with follow-up of at least 12 months or an event recorded before month 12. Participants censored event-free before month 12 are excluded because their event status at 12 months is unknown.
-- **Longitudinal population:** All scheduled visits observed on/before a participant's follow-up end, excluding missing symptom outcomes for complete-case model fitting.
-- **Source:** Synthetic input CSV files in `data/`. Full variable definitions are in `data_dictionary.md`.
+- **Survie / Time-to-event:** 900 patients synthétiques avec dates, statut d'événement et covariables valides / 900 synthetic patients with valid follow-up, event indicator and covariates.
+- **Régression à 12 mois / 12-month logistic analysis:** patients avec suivi ≥ 12 mois ou événement avant 12 mois / participants followed ≥ 12 months or with an event before month 12; exclusion des censures précoces sans événement / early event-free censoring excluded.
+- **Longitudinal / Longitudinal:** visites observées avant la fin du suivi, en excluant les symptômes manquants pour l'ajustement / observed visits before follow-up ends, excluding missing symptom outcomes for model fitting.
+- **Source:** `data/synthetic_cohort.csv` et / and `data/synthetic_visits.csv`; voir / see `data_dictionary.md`.
 
-## 3. Outcomes and covariates
+## 3. Critères de jugement et covariables / Outcomes and covariates
 
-- **Primary time-to-event outcome:** Months to first simulated event, with event = 1 and right censoring at the last observed month (including administrative censoring at 18 months).
-- **Binary secondary outcome:** Event by month 12 in the evaluable analysis subset.
-- **Repeated binary outcome:** Symptom indicator (1 = present, 0 = absent) at visits scheduled at months 0, 3, 6, 9 and 12.
-- **Covariates:** Treatment group (Standard / Enhanced), age (years), clinical stage (I / II / III) and care centre (C1–C4). Baseline stage and treatment serve as categorical predictors.
+- **Principal / Primary:** temps jusqu'au premier événement simulé, censure à droite (administrative à 18 mois) / time to first simulated event, right censored (administrative at month 18).
+- **Secondaire / Secondary:** événement survenu avant ou à 12 mois parmi les dossiers évaluables / event by month 12 among evaluable records.
+- **Répété / Repeated:** symptôme binaire aux mois 0, 3, 6, 9 et 12 / binary symptom at months 0, 3, 6, 9 and 12.
+- **Covariables:** traitement / treatment (`Standard`, `Enhanced`), âge / age, stade / stage (`I`, `II`, `III`), centre / centre (`C1`–`C4`).
 
-## 4. Data quality and missingness
+## 4. Qualité des données et valeurs manquantes / Data quality and missingness
 
-Before analyses, verify patient IDs are unique, repeated-visit keys are unique, event coding and ranges are valid, every patient has a baseline visit, and no scheduled visit occurs after documented follow-up. Report missing symptom observations. No symptom imputation is implemented; model fitting uses observed symptom values only. These are simple QC rules, not a regulatory-grade data validation framework.
+**FR —** Vérifier unicité des identifiants patients, absence de doublons patient-visite, bornes des variables, présence d'une visite initiale et absence de visite après la fin du suivi. Décrire les symptômes manquants ; pas d'imputation dans cette version. Ces contrôles ne constituent pas une validation réglementaire.  
+**EN —** Check patient ID uniqueness, unique patient-visit keys, variable ranges, baseline visit presence and no visits beyond follow-up. Describe missing symptom observations; no imputation is applied. These are not regulatory-grade validation checks.
 
-## 5. Statistical analyses
+## 5. Analyses statistiques / Statistical analyses
 
-1. **Kaplan-Meier:** estimate survival probabilities by treatment group; display confidence bands.
-2. **Log-rank test:** unadjusted group comparison, with a chi-square reference distribution (1 degree of freedom).
-3. **Cox model:** `Surv(time_months, event) ~ treatment + age + stage + strata(center)` with Efron ties; report adjusted hazard ratios, 95% CIs and Wald p-values.
-4. **Assumptions:** assess the proportional-hazards assumption using `cox.zph` (Schoenfeld residual diagnostics). A non-significant test does not prove the assumption.
-5. **Logistic GLM:** fit `event_12m ~ treatment + age + stage` on the evaluable subset; report adjusted ORs and Wald 95% CIs. Report the number excluded because the 12-month outcome is unknown.
-6. **Longitudinal GLMM:** fit `symptom ~ treatment * visit_quarters + age + stage + (1 | patient_id)` using a binomial logit model. Report conditional ORs (Wald 95% CIs) and observed symptom rates over time.
+1. **Kaplan-Meier** — Estimation par traitement avec bandes d'incertitude / estimate survival by treatment with confidence bands.
+2. **Log-rank** — Comparaison non ajustée, loi de référence du Chi-deux à 1 ddl / unadjusted comparison, chi-square reference with 1 df.
+3. **Cox** — `Surv(time_months, event) ~ treatment + age + stage + strata(center)` ; liens Efron / Efron ties; HR ajustés, IC à 95 %, valeurs p / adjusted HRs, 95% CIs and p-values.
+4. **Diagnostics** — `cox.zph` et résidus de Schoenfeld / `cox.zph` and Schoenfeld residuals; un test non significatif ne prouve pas l'hypothèse / non-significance does not prove proportional hazards.
+5. **Logistique / Logistic GLM** — `event_12m ~ treatment + age + stage` ; OR ajustés et IC de Wald à 95 %, décompte des exclusions pour censure précoce / adjusted ORs, Wald 95% CIs and count of early-censored exclusions.
+6. **GLMM longitudinal** — `symptom ~ treatment * visit_quarters + age_10 + stage + (1 | patient_id)`, famille binomiale logit / binomial logit family. `age_10 = (age - mean(age)) / 10`, calculé parmi les observations utilisées / calculated in the fitted analysis sample. Rapporter les OR conditionnels et IC de Wald à 95 % / report conditional ORs and Wald 95% CIs.
 
-## 6. Reporting and interpretation
+## 6. Rapports / Reporting
 
-Provide summary tables (data quality, Cox HRs, log-rank, logistic ORs, GLMM ORs), KM curves, PH diagnostics and observed symptom-rate plots. All results are descriptive illustrations; clinical interpretation is prohibited.
+**FR —** Rapporter contrôles qualité, tableaux de HR et OR, test du log-rank, courbes Kaplan-Meier, diagnostics de Schoenfeld, taux de symptômes observés et informations de session R. Le rapport bilingue est produit depuis `reports/analysis_report.Rmd`.  
+**EN —** Report quality checks, HR and OR tables, log-rank results, Kaplan–Meier curves, Schoenfeld diagnostics, observed symptom rates and R session information. The bilingual report is rendered from `reports/analysis_report.Rmd`.
 
-## 7. Important limitations
+## 7. Limites / Limitations
 
-- Observational treatment assignment and measured/unmeasured confounding: **no causal effects** may be inferred.
-- Excluding early-censored patients from the 12-month logistic analysis may create selection bias.
-- GLMM complete-case analyses may be biased if symptom missingness is informative; outcome follow-up ends at the observed event/censoring time.
-- No multiple-imputation, competing-risk, propensity-score, cluster-robust inferential adjustment or sensitivity analyses are implemented in this initial portfolio version.
-- Simulated data cannot support generalisation to real patients or healthcare settings.
-- This educational plan has not undergone independent review, validation or prospective registration.
+**FR —** Affectation observationnelle et confusion résiduelle : aucune inférence causale. Biais possible par exclusion des censures précoces à 12 mois et par analyse des symptômes observés uniquement. Pas d'imputation multiple, d'analyse des risques concurrents, de matching ou IPTW, ni d'inférence robuste par clusters. Aucune généralisation aux patients réels ; SAP non évalué indépendamment.  
+**EN —** Observational treatment assignment and residual confounding prohibit causal inference. Early-censoring exclusions and observed-only symptom analysis may introduce bias. No multiple imputation, competing-risk modelling, propensity matching or IPTW, or cluster-robust inference is implemented. Results cannot be generalised to real patients; this SAP has not been independently reviewed.

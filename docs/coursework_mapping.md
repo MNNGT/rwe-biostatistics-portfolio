@@ -1,13 +1,15 @@
-# Coursework-to-portfolio mapping
+# Correspondance avec les enseignements / Coursework mapping
 
-The analysis methods were selected after reviewing the author's MSc R Markdown coursework. The original assignments and underlying teaching datasets are **not** distributed in this portfolio.
+**FR —** Les méthodes présentées ont été choisies après examen des devoirs R Markdown de Master 2. Les devoirs originaux et les jeux de données pédagogiques ne sont pas diffusés dans ce dépôt.  
+**EN —** Methods were selected after reviewing the author's MSc R Markdown coursework. Original assignments and teaching datasets are not distributed here.
 
-| University exercise | Demonstrated practical method | Adaptation in this portfolio |
+| UE / Coursework | Compétences exercées / Practised methods | Mise en œuvre / Portfolio adaptation |
 | --- | --- | --- |
-| STA-MLTC (survival analysis) | `survfit`, `survdiff`, `coxph`, `cox.zph`, model interpretation | `R/01_survival_analysis.R` |
-| STA-COXC (advanced survival) | Survival analysis with clinical endpoints, competing-risk concepts and diagnostics | Basic Cox/KM retained; competing-risk extensions excluded from first public version |
-| STA-MLTL (linear/logistic models) | `glm(family=binomial)`, odds ratios and confidence intervals | `R/02_logistic_regression.R` |
-| STA-LOGE (longitudinal data) | `geeglm`, `glmer`, random intercept, repeated observations | `R/03_longitudinal_glmm.R` (GLMM only; no GEE claim) |
-| INF-STAR preparatory exercise | Filtering, consistency assertions and synthetic-data programming | `R/00_data_quality.R` |
+| STA-MLTC | Kaplan-Meier, log-rank, Cox, diagnostics (`survfit`, `survdiff`, `coxph`, `cox.zph`) | `R/01_survival_analysis.R` |
+| STA-COXC | Survie avancée, événements concurrents / Advanced survival, competing-risk concepts | Kaplan-Meier et Cox uniquement dans ce dépôt / KM and Cox only |
+| STA-MLTL | Régression logistique, OR, IC / Logistic regression, ORs, CIs | `R/02_logistic_regression.R` |
+| STA-LOGE | GEE, GLMM, données répétées / GEE, GLMM, repeated measures | `R/03_longitudinal_glmm.R` — GLMM uniquement / GLMM only |
+| INF-STAR | Préparation et contrôles de données / Data handling and assertions | `R/00_data_quality.R` |
 
-This integrated portfolio is **a new demonstration project**; it is not a verbatim upload of coursework or a published peer-reviewed study. Functions, inputs and modelling choices were harmonised to a common synthetic cohort.
+**FR —** Il s'agit d'un nouveau projet de démonstration intégré, et non d'une copie littérale des devoirs ni d'une publication scientifique évaluée par les pairs. Les scripts et modèles ont été harmonisés autour d'une cohorte synthétique commune.  
+**EN —** This is a new integrated demonstration, not a verbatim upload of coursework or a peer-reviewed publication. Scripts and modelling choices were harmonised around one synthetic cohort.

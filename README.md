@@ -1,106 +1,99 @@
-# RWE Biostatistics Portfolio
+# RWE Biostatistics Portfolio | Portfolio de biostatistique RWE
 
-**Survival analysis · Cox regression · Logistic regression · Longitudinal GLMM · Data quality**
+**Marie-Noelle Nogeant · MSc Santé publique / Public Health · Aix-Marseille Université**  
+**R · Kaplan–Meier · Cox · Logistic regression / Régression logistique · Longitudinal GLMM / Modèle mixte longitudinal**
 
-**Author:** Marie-Noelle Nogeant | MSc Public Health, Aix-Marseille University  
-**Context:** Demonstration portfolio for RWE / biostatistics roles.  
-**Data:** 100% synthetic. No real patients, public-health surveillance extracts or institutional datasets are shared.
+### 📊 [Consulter le rapport scientifique / View the scientific report](https://mnngt.github.io/rwe-biostatistics-portfolio/reports/analysis_report.html)
 
-## Overview
+**🔎 [Qualité des données / Data quality](https://mnngt.github.io/rwe-biostatistics-portfolio/reports/analysis_report.html#data-quality)** · [Fichier HTML dans le dépôt / HTML file in the repository](reports/analysis_report.html) · [Code source R Markdown / R Markdown source](reports/analysis_report.Rmd)
 
-This repository demonstrates an end-to-end, reproducible analysis of a **synthetic observational oncology cohort** (900 simulated patients), with time-to-event outcomes and repeated binary symptom assessments. The study is fictional; its findings must not be used for clinical decisions.
+> **FR :** Les liens vers le rapport interactif fonctionnent après activation de **GitHub Pages** sur la branche `main` à la racine `/ (root)`. Le fichier `file:///...` de l'ordinateur local n'est pas accessible aux visiteurs.  
+> **EN:** The browser-viewable report links work after **GitHub Pages** is enabled for the `main` branch at `/ (root)`. A local `file:///...` path is not accessible to visitors.
 
-It adapts statistical methods practised in my MSc coursework (STA-MLTC, STA-COXC, STA-MLTL and STA-LOGE) into a single illustrative pipeline.
+[Français](#français) · [English](#english)
 
-## Methods demonstrated
+---
 
-| RWE / biostatistics task | Implementation |
+## Français
+
+### Présentation
+
+Portfolio méthodologique consacré à une **cohorte observationnelle fictive de 900 patients**, comprenant des données de survie et des mesures répétées de symptômes. Le projet illustre la construction d'un pipeline reproductible d'analyse de données de santé, inspiré des méthodes programmées sous R pendant le Master 2 en Santé publique (MQERS).
+
+**Toutes les données sont synthétiques.** Les résultats ne constituent ni une étude clinique réelle, ni une preuve d'efficacité d'un traitement, ni une estimation causale.
+
+### Méthodes présentées
+
+| Domaine | Contenu |
 | --- | --- |
-| Data quality | Primary keys, ranges, missingness, follow-up consistency, baseline records |
-| Time-to-event analyses | Kaplan-Meier, log-rank test, adjusted Cox model |
-| Model diagnostics | Proportional-hazards assessment using Schoenfeld residuals (`cox.zph`) |
-| Regression | Multivariable logistic GLM, ORs and Wald 95% confidence intervals |
-| Longitudinal data | Logistic mixed-effects model (GLMM) with patient-level random intercept |
-| Reproducible reporting | CSV tables, PNG figures, R Markdown report, session information |
+| Qualité des données | Unicité des identifiants, valeurs manquantes, règles de cohorte et suivi |
+| Analyse de survie | Kaplan-Meier, test du log-rank, modèle de Cox ajusté |
+| Diagnostic de Cox | Hypothèse des risques proportionnels : résidus de Schoenfeld (`cox.zph`) |
+| Régression | Régression logistique multivariée, OR et IC à 95 % |
+| Données longitudinales | GLMM logistique à intercept aléatoire par patient |
+| Reproductibilité | Scripts R, tableaux CSV, figures PNG, rapport R Markdown, informations de session |
 
-**Scope:** Methods are showcased on simulated data. This is **not** a validated clinical study or a claim of causal treatment effects. Propensity-score matching/weighting, GEE, competing-risk models and formal clinical-study SAP validation are not implemented here.
+### Documents
 
-## Repository structure
+- [Rapport scientifique bilingue](reports/analysis_report.Rmd) · [Plan d'analyse statistique (SAP)](docs/statistical_analysis_plan.md)
+- [Dictionnaire des données](docs/data_dictionary.md) · [Correspondance avec les enseignements](docs/coursework_mapping.md)
 
-```text
-rwe-biostatistics-portfolio/
-├── README.md
-├── run_all.R
-├── R/
-│   ├── 00_data_quality.R
-│   ├── 01_survival_analysis.R
-│   ├── 02_logistic_regression.R
-│   └── 03_longitudinal_glmm.R
-├── data/
-│   ├── synthetic_cohort.csv
-│   └── synthetic_visits.csv
-├── tools/
-│   └── generate_synthetic_data.py
-├── docs/
-│   ├── statistical_analysis_plan.md
-│   ├── data_dictionary.md
-│   └── coursework_mapping.md
-├── reports/
-│   └── analysis_report.Rmd
-└── outputs/
-    ├── figures/
-    └── tables/
-```
+### Exécution
 
-## Run the R analyses
-
-Prerequisites: R 4.2+ and the packages `survival` and `lme4`. RStudio is optional.
-
-Open the project folder in RStudio and set the **working directory to the repository root**. Install the R packages **once**, if necessary:
+Dans RStudio, ouvrir ce dossier et définir sa racine comme répertoire de travail. Installer les dépendances une seule fois, si nécessaire :
 
 ```r
 install.packages(c("survival", "lme4", "rmarkdown", "knitr"))
-```
-
-Then:
-
-```r
 source("run_all.R")
 rmarkdown::render("reports/analysis_report.Rmd")
 ```
 
-Or, from a terminal in the repository root:
+Les tableaux sont enregistrés dans `outputs/tables/`, les graphiques dans `outputs/figures/` et le rapport HTML dans `reports/analysis_report.html`. Le générateur Python dans `tools/` est facultatif : les CSV synthétiques nécessaires sont déjà fournis.
 
-```bash
-Rscript run_all.R
+### Précautions et limites
+
+Les affectations de traitement sont observationnelles et fictives ; aucun effet causal ne peut être conclu. L'analyse logistique à 12 mois exclut les personnes censurées précocement sans événement connu. Les OR conditionnels du GLMM ne sont pas interchangeables avec des effets marginaux de type GEE. Le projet n'implémente pas le matching, l'IPTW, les risques concurrents ni une validation réglementaire du SAP.
+
+---
+
+## English
+
+### Overview
+
+A reproducible methodological portfolio using a **fictional observational cohort of 900 patients**, with time-to-event outcomes and repeated binary symptom measurements. It demonstrates an end-to-end healthcare-data analysis workflow, drawing on statistical methods programmed in R during MSc Public Health (MQERS) coursework.
+
+**All data are synthetic.** This is not a real clinical study, evidence of treatment efficacy, or a causal-effect analysis.
+
+### Methods demonstrated
+
+| Area | Implementation |
+| --- | --- |
+| Data quality | Unique identifiers, missingness, cohort rules and follow-up consistency |
+| Survival analysis | Kaplan–Meier, log-rank test, adjusted Cox regression |
+| Cox diagnostics | Proportional-hazards assumption using Schoenfeld residuals (`cox.zph`) |
+| Regression | Multivariable logistic regression, odds ratios and 95% confidence intervals |
+| Longitudinal data | Patient-level random-intercept logistic GLMM |
+| Reproducibility | R scripts, CSV tables, PNG figures, R Markdown report, session information |
+
+### Documentation
+
+- [Bilingual scientific report](reports/analysis_report.Rmd) · [Statistical Analysis Plan (SAP)](docs/statistical_analysis_plan.md)
+- [Data dictionary](docs/data_dictionary.md) · [Coursework mapping](docs/coursework_mapping.md)
+
+### How to run
+
+Open the repository folder in RStudio and set the working directory to its root. Install dependencies once if needed:
+
+```r
+install.packages(c("survival", "lme4", "rmarkdown", "knitr"))
+source("run_all.R")
+rmarkdown::render("reports/analysis_report.Rmd")
 ```
 
-After execution, tables are written to `outputs/tables/`, figures to `outputs/figures/`, and environment information to `outputs/session_info.txt`. The optional HTML report is rendered into `reports/`.
+Tables are saved to `outputs/tables/`, figures to `outputs/figures/`, and the HTML report to `reports/analysis_report.html`. The Python data generator in `tools/` is optional: the synthetic CSV inputs are included.
 
-### Re-generate the synthetic data (optional)
+### Limitations and ethics
 
-The included sample CSVs were generated with the fixed Python random seed `20261116` using the reproducible generator in `tools/`. **This generator is a convenience for simulated input data; the statistical analyses are implemented in R.** To replace the sample CSVs:
+Treatment assignment is simulated and observational; causal effects cannot be inferred. The 12-month logistic analysis excludes early-censored individuals with unknown outcomes. Conditional GLMM odds ratios are not interchangeable with marginal GEE effects. Propensity-score matching, IPTW, competing-risk modelling and regulatory SAP validation are outside the scope of this demonstration.
 
-```bash
-python -m pip install numpy pandas
-python tools/generate_synthetic_data.py
-```
-
-Re-running the generator overwrites the simulated CSVs. The two tracked CSV files already suffice for running the R pipeline; Python is **not required** to run the statistical analyses.
-
-## How to interpret the outputs
-
-- **Hazard ratios** from the Cox model are adjusted associations between covariates and instantaneous event rates, under the proportional-hazards assumption.
-- **Odds ratios** from the logistic model describe the odds of an observed 12-month event among patients whose 12-month outcome can be determined. Patients censored before month 12 without an event are excluded, which can introduce selection bias.
-- **Conditional odds ratios** from the GLMM describe within-model patient-specific associations in repeated symptom observations. They are not directly interchangeable with marginal GEE effects.
-- No effect estimate from these synthetic data should be interpreted as medical evidence.
-
-Consult [the statistical analysis plan](docs/statistical_analysis_plan.md) and [data dictionary](docs/data_dictionary.md) for the design, analysis population, assumptions and limitations.
-
-## Data provenance and ethics
-
-All example data are simulated specifically for this demonstration. Dataset values, associations and sample size are fictional. The repository does not contain patient-level research extracts, institutional datasets, or original university teaching datasets. The MSc exercise files themselves are not redistributed here.
-
-## Reproducibility note
-
-The scripts were assembled and adapted for this portfolio and should be **executed and reviewed locally before representing the outputs as validated**. The repository is intended to showcase analytical workflows, rather than production-ready clinical software.
+**No confidential patient, institutional surveillance or original teaching datasets are included.**

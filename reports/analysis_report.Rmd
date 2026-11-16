@@ -1,11 +1,14 @@
 ---
-title: "Synthetic Oncology Cohort – RWE Biostatistics Demonstration"
+title: "Portfolio RWE – Analyse biostatistique / Biostatistical Analysis"
+subtitle: "Cohorte d'oncologie entièrement simulée / Fully synthetic oncology cohort"
 author: "Marie-Noelle Nogeant"
 date: "2026-11-16"
 output:
   html_document:
     toc: true
+    toc_depth: 2
     number_sections: true
+    self_contained: true
 ---
 
 ```{r setup, include=FALSE}
@@ -14,70 +17,100 @@ stopifnot(file.exists("../outputs/tables/data_quality_summary.csv"))
 read_table <- function(name) utils::read.csv(file.path("../outputs/tables", name), check.names = FALSE)
 ```
 
-# Summary
+# Résumé / Summary {#summary}
 
-This is an **educational RWE methodology demonstration using entirely synthetic patient data**. It is not a real clinical study, and none of the estimates can guide healthcare decisions.
+**FR —** Ce rapport illustre plusieurs méthodes utilisées en biostatistique et en études fondées sur les données de vie réelle (RWE), à partir d'une **cohorte entièrement synthétique de 900 patients**. Le projet est pédagogique : il ne s'agit pas d'une étude clinique et les estimations ne doivent pas guider des décisions médicales.
 
-The analysis draws on MSc-level coursework covering survival analysis, regression and longitudinal mixed-effects modelling. The detailed methodology and assumptions are in `docs/statistical_analysis_plan.md`.
+**EN —** This report demonstrates methods used in biostatistics and Real-World Evidence (RWE) studies using a **fully synthetic cohort of 900 patients**. It is an educational demonstration, not a clinical study; estimates must not guide medical decisions.
 
-# Data quality
+**FR —** Les analyses s'inspirent des travaux de Master 2 en santé publique portant sur l'analyse de survie, les modèles de régression et les données longitudinales. Le protocole méthodologique figure dans le [plan d'analyse statistique](../docs/statistical_analysis_plan.md).
+
+**EN —** The analyses build on MSc Public Health coursework in survival analysis, regression and longitudinal modelling. See the [statistical analysis plan](../docs/statistical_analysis_plan.md) for the detailed methodology.
+
+# Qualité des données / Data quality {#data-quality}
+
+**FR —** Vérifications des identifiants, de la cohérence du suivi et des valeurs manquantes avant les analyses.  
+**EN —** Checks of identifiers, follow-up consistency and missing values before the analyses.
 
 ```{r qc}
-knitr::kable(read_table("data_quality_summary.csv"), digits = 3)
+knitr::kable(read_table("data_quality_summary.csv"), digits = 3,
+             caption = "Contrôles qualité / Data quality checks")
 ```
 
-# Kaplan-Meier and log-rank test
+# Kaplan-Meier et log-rank / Kaplan–Meier and log-rank {#survival-analysis}
 
-```{r km-figure, out.width='90%'}
+**FR —** Les courbes de Kaplan-Meier décrivent la probabilité de rester sans événement au cours du suivi selon le groupe de traitement simulé. Le test du log-rank compare les courbes sans ajustement sur les covariables.  
+**EN —** Kaplan–Meier curves describe event-free survival over follow-up by simulated treatment group. The log-rank test compares the curves without covariate adjustment.
+
+```{r km-figure, fig.cap="Courbes de Kaplan-Meier / Kaplan–Meier curves", out.width='90%'}
 knitr::include_graphics("../outputs/figures/kaplan_meier.png")
 ```
 
 ```{r logrank-table}
-knitr::kable(read_table("logrank_test.csv"), digits = 4)
+knitr::kable(read_table("logrank_test.csv"), digits = 4,
+             caption = "Test du log-rank / Log-rank test")
 ```
 
-The log-rank test is unadjusted. Differences between treatment groups in these simulated observational data must not be interpreted causally.
+**FR —** Une différence observée dans ces données fictives ne démontre pas un effet causal du traitement.  
+**EN —** An observed difference in these fictional data does not demonstrate a causal treatment effect.
 
-# Adjusted Cox model
+# Modèle de Cox ajusté / Adjusted Cox regression {#cox-regression}
+
+**FR —** Le modèle de Cox estime des hazard ratios ajustés. Le modèle stratifie le risque de base par centre et tient compte du groupe de traitement, de l'âge et du stade clinique.  
+**EN —** The Cox model estimates adjusted hazard ratios. Baseline hazards are stratified by centre, with treatment group, age and clinical stage included as covariates.
 
 ```{r cox-table}
-knitr::kable(read_table("cox_hazard_ratios.csv"), digits = 3)
+knitr::kable(read_table("cox_hazard_ratios.csv"), digits = 3,
+             caption = "Hazard ratios ajustés / Adjusted hazard ratios")
 ```
+
+**FR —** L'hypothèse des risques proportionnels est examinée avec les résidus de Schoenfeld et la fonction `cox.zph()`. Un test non significatif ne démontre pas à lui seul que l'hypothèse est satisfaite.  
+**EN —** Proportional hazards are assessed with Schoenfeld residuals using `cox.zph()`. A non-significant test alone does not prove the assumption holds.
 
 ```{r cox-diagnostics-table}
-knitr::kable(read_table("cox_ph_assumptions.csv"), digits = 3)
+knitr::kable(read_table("cox_ph_assumptions.csv"), digits = 3,
+             caption = "Diagnostics des risques proportionnels / Proportional-hazards diagnostics")
 ```
 
-```{r cox-figure, out.width='90%'}
+```{r cox-figure, fig.cap="Diagnostics de Schoenfeld / Schoenfeld diagnostics", out.width='90%'}
 knitr::include_graphics("../outputs/figures/cox_schoenfeld.png")
 ```
 
-A non-significant Schoenfeld-residual test does not establish that proportional hazards are definitively satisfied.
+# Régression logistique à 12 mois / Logistic regression at 12 months {#logistic-regression}
 
-# Logistic regression at month 12
+**FR —** Une régression logistique multivariée modélise la survenue d'un événement avant 12 mois parmi les personnes dont le statut à 12 mois peut être déterminé. Les personnes censurées sans événement avant 12 mois sont exclues, ce qui peut introduire un biais de sélection.  
+**EN —** Multivariable logistic regression models an event by month 12 among participants whose 12-month event status is known. Participants censored event-free before month 12 are excluded, potentially introducing selection bias.
 
 ```{r logistic-eligible}
-knitr::kable(read_table("logistic_model_summary.csv"), digits = 3)
+knitr::kable(read_table("logistic_model_summary.csv"), digits = 3,
+             caption = "Population évaluable et performance / Evaluable population and performance")
 ```
 
 ```{r logistic-table}
-knitr::kable(read_table("logistic_odds_ratios.csv"), digits = 3)
+knitr::kable(read_table("logistic_odds_ratios.csv"), digits = 3,
+             caption = "Odds ratios ajustés / Adjusted odds ratios")
 ```
 
-The analysis excludes patients censored event-free before month 12 because their outcome is unobserved. This can introduce selection bias.
+# Symptômes répétés : GLMM / Repeated symptoms: GLMM {#longitudinal-glmm}
 
-# Repeated symptoms: logistic GLMM
+**FR —** Un modèle logistique mixte (GLMM) à intercept aléatoire par patient tient compte de la corrélation des observations répétées. L'âge est centré et exprimé par tranche de dix ans (`age_10`) pour améliorer le comportement numérique de l'ajustement. Les OR sont conditionnels au modèle et ne correspondent pas à des OR marginaux GEE.  
+**EN —** A patient-level random-intercept logistic GLMM accounts for correlated repeated observations. Age is centred and scaled per ten years (`age_10`) to improve numerical stability. The reported odds ratios are conditional model estimates and are not marginal GEE odds ratios.
 
-```{r glmm-figure, out.width='90%'}
+```{r glmm-figure, fig.cap="Proportions observées de symptômes / Observed symptom proportions", out.width='90%'}
 knitr::include_graphics("../outputs/figures/observed_symptom_rates.png")
 ```
 
 ```{r glmm-table}
-knitr::kable(read_table("glmm_conditional_odds_ratios.csv"), digits = 3)
+knitr::kable(read_table("glmm_conditional_odds_ratios.csv"), digits = 3,
+             caption = "Odds ratios conditionnels du GLMM / GLMM conditional odds ratios")
 ```
 
-These are model-based **conditional**, not marginal, odds ratios. Symptom measurements are only included while participants remain under observation.
+**FR —** Seules les mesures observées pendant le suivi sont utilisées. Les résultats doivent être interprétés dans le cadre des règles de simulation.  
+**EN —** Only symptom observations available during follow-up are analysed. Results must be interpreted within the simulation framework.
 
-# Limitations
+# Limites et éthique / Limitations and ethics {#limitations}
 
-The data are simulated; there is no causal identification, no real-world generalisability and no clinical validation. The initial demonstration does not implement propensity-score adjustment, imputation or competing-risk estimation. Review the SAP and code before drawing methodological conclusions.
+**FR —** Les données sont entièrement simulées. L'absence de randomisation, les biais potentiels de sélection et les valeurs manquantes empêchent toute interprétation causale. Ce projet n'effectue ni ajustement par scores de propension, ni imputation multiple, ni analyse des risques concurrents. Aucun résultat n'est généralisable à des patients réels.  
+**EN —** All data are simulated. Non-random treatment assignment, potential selection bias and missing values preclude causal interpretation. This demonstration does not implement propensity-score adjustment, multiple imputation or competing-risk analysis. Findings cannot be generalised to real patients.
+
+**FR / EN —** Code et documentation / Code and documentation : [README](../README.md) · [SAP](../docs/statistical_analysis_plan.md) · [Dictionnaire / Data dictionary](../docs/data_dictionary.md)
